@@ -2,6 +2,7 @@ defmodule ThumbnailTest do
   use ExUnit.Case
 
   @filename "test/images/cactus.jpg"
+  @no_exif "test/images/volvo.jpg"
   @thumbname "test/images/cactus-thumb.jpg"
 
   alias Exexif.Data.Thumbnail
@@ -20,10 +21,7 @@ defmodule ThumbnailTest do
            } = metadata.thumbnail
   end
 
-  # test "gps is printed in human readable manner" do
-  #   {:ok, metadata} = exif_from_jpeg_buffer(@data)
-
-  #   assert "#{metadata.gps}" == "41°23´16˝N,2°11´50˝E"
-
-  # end
+  test "file with incomplete exif" do
+    assert %{orientation: "Horizontal (normal)"} == exif_from_jpeg_file!(@no_exif)
+  end
 end
