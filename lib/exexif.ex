@@ -204,12 +204,13 @@ defmodule Exexif do
     end
   end
 
-  @spec reshape(%{exif: t()}) :: %{exif: t()}
-  defp reshape(result), do: extract_thumbnail(result)
+  @spec reshape(%{exif: t()} | map()) :: %{exif: t()} | map()
+  defp reshape(%{exif: %{} = _} = result), do: extract_thumbnail(result)
+  defp reshape(result), do: result
 
   @spec extract_thumbnail(%{exif: t()}) :: %{exif: t()}
-  defp extract_thumbnail(result) do
-    exif_keys = Map.keys(result.exif)
+  defp extract_thumbnail(%{exif: exif} = result) do
+    exif_keys = Map.keys(exif)
 
     result =
       if Enum.all?(Thumbnail.fields(), fn e -> Enum.any?(exif_keys, &(&1 == e)) end) do
@@ -219,7 +220,7 @@ defmodule Exexif do
           struct(
             Thumbnail,
             Thumbnail.fields()
-            |> Enum.map(fn e -> {e, result.exif[e]} end)
+            |> Enum.map(fn e -> {e, exif[e]} end)
             |> Enum.into(%{})
           )
         )
@@ -227,6 +228,6 @@ defmodule Exexif do
         result
       end
 
-    %{result | exif: Map.drop(result.exif, Thumbnail.fields())}
+    %{result | exif: Map.drop(exif, Thumbnail.fields())}
   end
 end
