@@ -290,12 +290,20 @@ defmodule Exexif.Decode do
   defp flash(0x5F), do: "Auto, Fired, Red-eye reduction, Return detected"
   defp flash(other), do: "Unknown (#{other})"
 
-  @spec version(charlist()) :: binary()
+  @spec version(charlist() | String.t()) :: binary()
   defp version([?0, major, minor1, minor2]) do
     <<major, ?., minor1, minor2>>
   end
 
   defp version([major1, major2, minor1, minor2]) do
+    <<major1, major2, ?., minor1, minor2>>
+  end
+
+  defp version(<<?0, major, minor1, minor2>>) do
+    <<major, ?., minor1, minor2>>
+  end
+
+  defp version(<<major1, major2, minor1, minor2>>) do
     <<major1, major2, ?., minor1, minor2>>
   end
 end
