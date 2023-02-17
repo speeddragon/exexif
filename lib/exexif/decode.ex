@@ -152,11 +152,13 @@ defmodule Exexif.Decode do
   @comp_conf {"-", "Y", "Cb", "Cr", "R", "G", "B"}
 
   @spec component_configuration([non_neg_integer()]) :: binary()
-  defp component_configuration(list) do
+  defp component_configuration(list) when is_list(list) do
     list
     |> Enum.map(&elem(@comp_conf, &1))
     |> Enum.join(",")
   end
+
+  defp component_configuration(_), do: nil
 
   @spec metering_mode(non_neg_integer()) :: binary()
   defp metering_mode(1), do: "Average"
