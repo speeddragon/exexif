@@ -292,20 +292,40 @@ defmodule Exexif.Decode do
   defp flash(0x5F), do: "Auto, Fired, Red-eye reduction, Return detected"
   defp flash(other), do: "Unknown (#{other})"
 
-  @spec version(charlist() | binary()) :: binary()
-  defp version([?0, major, minor1, minor2]) do
+  @spec version(charlist() | binary() | non_neg_integer()) :: binary()
+  def version([?0, major, minor1, minor2]) do
     <<major, ?., minor1, minor2>>
   end
 
-  defp version([major1, major2, minor1, minor2]) do
+  def version([major1, major2, minor1, minor2]) do
     <<major1, major2, ?., minor1, minor2>>
   end
 
-  defp version(<<?0, major, minor1, minor2>>) do
+  def version(<<?0, major, minor1, minor2>>) do
     <<major, ?., minor1, minor2>>
   end
 
-  defp version(<<major1, major2, minor1, minor2>>) do
+  def version(<<major1, major2, minor1, minor2>>) do
     <<major1, major2, ?., minor1, minor2>>
+  end
+
+  def version(<<?0, major2, minor1>>) do
+    <<major2, ?., minor1, ?0>>
+  end
+
+  def version(<<major1, major2, minor1>>) do
+    <<major1, major2, ?., minor1, ?0>>
+  end
+
+  def version([?0, major2, minor1]) do
+    <<major2, ?., minor1, ?0>>
+  end
+
+  def version([major1, major2, minor1]) do
+    <<major1, major2, ?., minor1, ?0>>
+  end
+
+  def version(version) when is_integer(version) and version >= 100 and version <= 999 do
+    version("0#{Integer.to_string(version)}")
   end
 end
