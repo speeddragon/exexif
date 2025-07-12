@@ -39,6 +39,9 @@ defmodule Exexif.Decode do
   def tag(_, 0x9000, value), do: {:exif_version, version(value)}
   def tag(_, 0x9003, value), do: {:datetime_original, value}
   def tag(_, 0x9004, value), do: {:datetime_digitized, value}
+  def tag(_, 0x9010, value), do: {:offset_time, value}
+  def tag(_, 0x9011, value), do: {:offset_time_original, value}
+  def tag(_, 0x9012, value), do: {:offset_time_digitized, value}
   def tag(_, 0x9101, value), do: {:component_configuration, component_configuration(value)}
   def tag(_, 0x9102, value), do: {:compressed_bits_per_pixel, value}
   def tag(_, 0x9201, value), do: {:shutter_speed_value, value}
@@ -57,11 +60,14 @@ defmodule Exexif.Decode do
   def tag(_, 0x9290, value), do: {:subsec_time, value}
   def tag(_, 0x9291, value), do: {:subsec_time_orginal, value}
   def tag(_, 0x9292, value), do: {:subsec_time_digitized, value}
+  def tag(_, 0x9A00, value), do: {:xiaomi_model, value}
+  def tag(_, 0x9999, value), do: {:xiaomi_settings, value}
   def tag(_, 0xA000, value), do: {:flash_pix_version, version(value)}
   def tag(_, 0xA001, value), do: {:color_space, color_space(value)}
   def tag(_, 0xA002, value), do: {:exif_image_width, value}
   def tag(_, 0xA003, value), do: {:exif_image_height, value}
   def tag(_, 0xA004, value), do: {:related_sound_file, value}
+  def tag(_, 0xA005, value), do: {:interop_offset, value}
   def tag(_, 0xA20B, value), do: {:flash_energy, value}
   def tag(_, 0xA20C, value), do: {:spatial_frequency_response, value}
   def tag(_, 0xA20E, value), do: {:focal_plane_x_resolution, value}
@@ -93,6 +99,7 @@ defmodule Exexif.Decode do
   def tag(_, 0xA433, value), do: {:lens_make, value}
   def tag(_, 0xA434, value), do: {:lens_model, value}
   def tag(_, 0xA435, value), do: {:lens_serial_number, value}
+  def tag(_, 0xA460, value), do: {:composite_image, composite_image(value)}
 
   # http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/GPS.html
   Gps.fields()
@@ -291,6 +298,13 @@ defmodule Exexif.Decode do
   defp flash(0x5D), do: "Auto, Fired, Red-eye reduction, Return not detected"
   defp flash(0x5F), do: "Auto, Fired, Red-eye reduction, Return detected"
   defp flash(other), do: "Unknown (#{other})"
+
+  @spec composite_image(integer()) :: binary()
+  defp composite_image(0), do: "Unknown"
+  defp composite_image(1), do: "Not a Composite Image"
+  defp composite_image(2), do: "General Composite Image"
+  defp composite_image(3), do: "Composite Image Captured While Shooting"
+  defp composite_image(other), do: "Unknown (#{other})"
 
   @spec version(charlist() | binary()) :: binary()
   defp version([?0, major, minor1, minor2]) do
