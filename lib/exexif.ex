@@ -124,7 +124,12 @@ defmodule Exexif do
     42 = read_unsigned.(forty_two)
     offset = read_unsigned.(offset)
 
-    {:ok, reshape(read_ifd({exif, offset, read_unsigned}))}
+    result =
+      {exif, offset, read_unsigned}
+      |> read_ifd()
+      |> reshape()
+
+    {:ok, result}
   end
 
   def read_exif(<<0xFF::8, _number::8, len::16, data::binary>>) do
