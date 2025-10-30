@@ -26,6 +26,7 @@ defmodule Exexif.Decode do
 
   def tag(:exif, 0x0201, value), do: {:thumbnail_offset, value}
   def tag(:exif, 0x0202, value), do: {:thumbnail_size, value}
+  def tag(:exif, 0x0213, value), do: {:y_cb_cr_positioning, y_cb_cr_positioning(value)}
 
   def tag(_, 0x829A, value), do: {:exposure_time, value}
   def tag(_, 0x829D, value), do: {:f_number, value}
@@ -305,6 +306,10 @@ defmodule Exexif.Decode do
   defp composite_image(2), do: "General Composite Image"
   defp composite_image(3), do: "Composite Image Captured While Shooting"
   defp composite_image(other), do: "Unknown (#{other})"
+
+  defp y_cb_cr_positioning(1), do: "Centered"
+  defp y_cb_cr_positioning(2), do: "Co-sited"
+  defp y_cb_cr_positioning(other), do: "Unknown (#{other})"
 
   @spec version(charlist() | binary() | non_neg_integer()) :: binary()
   def version([?0, major, minor1, minor2]) do
