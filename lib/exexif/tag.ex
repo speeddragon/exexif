@@ -61,21 +61,33 @@ defmodule Exexif.Tag do
     values =
       if length > 4 do
         case exif do
-          <<_::binary-size(value), data::binary-size(length), _::binary>> -> data
-          # probably a maker_note or user_comment
-          _ -> nil
+          <<_::binary-size(value), data::binary-size(length), _::binary>> ->
+            data
+
+          # maker_note or user_comment
+          _ ->
+            pos = :binary.decode_unsigned(<<222, 4, 0, 0>>, :little)
+            maker_notes = :binary.part(exif, pos, length) |> to_string()
+
+            if String.contains?(exif, "Panasonic") do
+              Exexif.Manufacturer.Panasonic.parse_makernote(maker_notes)
+            else
+              %{}
+            end
         end
       else
         <<data::binary-size(length), _::binary>> = value
         data
       end
 
-    if values do
+    if is_binary(values) do
       if count == 1 do
         ru.(values)
       else
         read_unsigned_many(values, size, ru)
       end
+    else
+      values
     end
   end
 
