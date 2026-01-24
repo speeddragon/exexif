@@ -15,7 +15,7 @@ defmodule Exexif.Mixfile do
 
   def application do
     [
-      applications: []
+      extra_applications: [:logger]
     ]
   end
 
@@ -33,12 +33,16 @@ defmodule Exexif.Mixfile do
     """
   end
 
-  @me "Aleksei Matiushkin <am@mudasobwa.ru>"
+  @me "David Magalhães <speeddragon@gmail.com>"
   defp package do
     [
       files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
       maintainers: [@me],
-      contributors: ["Dave Thomas <dave@pragprog.org>", @me],
+      contributors: [
+        "Dave Thomas <dave@pragprog.org>",
+        "Aleksei Matiushkin <am@mudasobwa.ru>",
+        @me
+      ],
       licenses: ["MIT. See LICENSE.md"],
       links: %{
         "GitHub" => "https://github.com/am-kantox/exexif"

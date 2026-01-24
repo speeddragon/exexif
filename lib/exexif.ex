@@ -15,6 +15,21 @@ defmodule Exexif do
   alias Exexif.Data.{Gps, Thumbnail}
 
   @type t :: %{
+          optional(:image_width) => integer(),
+          optional(:image_height) => integer(),
+          optional(:document_name) => String.t(),
+          optional(:image_description) => String.t(),
+          optional(:make) => String.t(),
+          optional(:model) => String.t(),
+          optional(:orientation) => String.t(),
+          optional(:x_resolution) => integer(),
+          optional(:y_resolution) => integer(),
+          optional(:resolution_units) => String.t(),
+          optional(:software) => String.t(),
+          optional(:modify_date) => String.t(),
+          optional(:exif) => exif()
+        }
+  @type exif :: %{
           :brightness_value => float(),
           :color_space => binary(),
           :component_configuration => binary(),
@@ -64,7 +79,7 @@ defmodule Exexif do
 
   @spec exif_from_jpeg_file(binary()) ::
           {:error, :no_exif_data_in_jpeg | :not_a_jpeg_file | :file.posix()}
-          | {:ok, %{exif: t()}}
+          | {:ok, t()}
   @doc "Extracts EXIF from jpeg file"
   def exif_from_jpeg_file(name) when is_binary(name) do
     with {:ok, buffer} <- File.open(name, [:read], &IO.binread(&1, @max_exif_len)),
@@ -72,7 +87,7 @@ defmodule Exexif do
   end
 
   @doc "Extracts EXIF from jpeg file, raises on any error"
-  @spec exif_from_jpeg_file!(binary()) :: %{exif: t()} | no_return()
+  @spec exif_from_jpeg_file!(binary()) :: t() | no_return()
   def exif_from_jpeg_file!(name) when is_binary(name) do
     case exif_from_jpeg_file(name) do
       {:ok, result} -> result
@@ -81,14 +96,14 @@ defmodule Exexif do
   end
 
   @spec exif_from_jpeg_buffer(binary()) ::
-          {:error, :no_exif_data_in_jpeg | :not_a_jpeg_file} | {:ok, %{exif: t()}}
+          {:error, :no_exif_data_in_jpeg | :not_a_jpeg_file} | {:ok, t()}
   @doc "Extracts EXIF from binary buffer"
   def exif_from_jpeg_buffer(<<@image_start_marker::16, rest::binary>>),
     do: read_exif(rest)
 
   def exif_from_jpeg_buffer(_), do: {:error, :not_a_jpeg_file}
 
-  @spec exif_from_jpeg_buffer!(binary()) :: %{exif: t()} | no_return()
+  @spec exif_from_jpeg_buffer!(binary()) :: t() | no_return()
   @doc "Extracts EXIF from binary buffer, raises on any error"
   def exif_from_jpeg_buffer!(buffer) do
     case exif_from_jpeg_buffer(buffer) do
@@ -97,7 +112,7 @@ defmodule Exexif do
     end
   end
 
-  @spec read_exif(binary()) :: {:error, :no_exif_data_in_jpeg} | {:ok, %{exif: t()}}
+  @spec read_exif(binary()) :: {:error, :no_exif_data_in_jpeg} | {:ok, t()}
   def read_exif(<<
         @app1_marker::16,
         _len::16,
@@ -209,11 +224,11 @@ defmodule Exexif do
     end
   end
 
-  @spec reshape(%{exif: t()} | map()) :: %{exif: t()} | map()
+  @spec reshape(t() | map()) :: t() | map()
   defp reshape(%{exif: %{} = _} = result), do: extract_thumbnail(result)
   defp reshape(result), do: result
 
-  @spec extract_thumbnail(%{exif: t()}) :: %{exif: t()}
+  @spec extract_thumbnail(t()) :: t()
   defp extract_thumbnail(%{exif: exif} = result) do
     exif_keys = Map.keys(exif)
 
