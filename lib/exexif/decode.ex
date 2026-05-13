@@ -311,7 +311,7 @@ defmodule Exexif.Decode do
   defp y_cb_cr_positioning(2), do: "Co-sited"
   defp y_cb_cr_positioning(other), do: "Unknown (#{other})"
 
-  @spec version(charlist() | binary() | non_neg_integer()) :: binary()
+  @spec version(charlist() | binary() | non_neg_integer() | nil) :: binary()
   def version([?0, major, minor1, minor2]) do
     <<major, ?., minor1, minor2>>
   end
@@ -346,5 +346,9 @@ defmodule Exexif.Decode do
 
   def version(version) when is_integer(version) and version >= 100 and version <= 999 do
     version("0#{Integer.to_string(version)}")
+  end
+
+  def version(nil) do
+    <<?0, ?0, ?0, ?0>>
   end
 end
